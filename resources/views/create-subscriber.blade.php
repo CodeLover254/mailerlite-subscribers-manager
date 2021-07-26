@@ -26,6 +26,9 @@
                         <input type="submit" value="Add" class="btn btn-success btn-sm">&nbsp;
                         @include('layouts.messages')
                     </div>
+                    <div class="form-group mt-2">
+                        <a href="{{route('subscribers')}}" class="btn btn-primary p-2 col-md-12"><i class="fas fa-house-user"></i> Go to Home</a>
+                    </div>
                 </div>
             </form>
         </div>
