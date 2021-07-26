@@ -48,7 +48,7 @@ $(document).ready(()=>{
        if(response.status!==200){
            alert(response.data.error)
        }else{
-           const status = response.data.success;
+           const status = response.data.status;
            if(status){
                tableRow.fadeOut('slow');
            }else{
