@@ -11,7 +11,7 @@ in order to successfully interact with the application.
 ## Steps to successfully run the application
 <ul>
     <li>Clone the project from this repository.</li>
-    <li>Open the terminal and navigate to <b>mailerlite-subscibers-manager</b>> folder.</li>
+    <li>Open the terminal and navigate to <b>mailerlite-subscibers-manager</b> folder.</li>
     <li>Run <i>composer install</i> command to install required dependencies</li>
     <li>For the database sql file, navigate to database/scripts folder and use the file
         to create and populate the database using your favourite MySQL database tool.</li>
