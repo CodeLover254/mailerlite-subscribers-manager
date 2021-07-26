@@ -11,8 +11,15 @@
     },
     "devDependencies": {
         "axios": "^0.21",
+        "jquery": "^3.6.0",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
-        "postcss": "^8.1.14"
+        "node-sass": "^6.0.1",
+        "postcss": "^8.1.14",
+        "sass-loader": "^12.1.0"
+    },
+    "dependencies": {
+        "@popperjs/core": "^2.9.2",
+        "bootstrap": "^5.0.2"
     }
 }
