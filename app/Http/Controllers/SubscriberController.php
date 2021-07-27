@@ -6,6 +6,7 @@ use App\Http\Requests\SubscriberEditFormRequest;
 use App\Http\Requests\SubscriberFormRequest;
 use App\Models\Group;
 use App\Services\MailerliteApiService;
+use App\Services\SubscriberSortFilterService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -24,12 +25,18 @@ class SubscriberController extends Controller
     private $group;
 
     /**
+     * @var SubscriberSortFilterService
+     */
+    private $sortFilterService;
+
+    /**
      * SubscriberController constructor.
      * @param MailerliteApiService $mailerliteApiService
      */
-    public function __construct(MailerliteApiService $mailerliteApiService)
+    public function __construct(MailerliteApiService $mailerliteApiService, SubscriberSortFilterService $subscriberSortFilterService)
     {
         $this->apiService = $mailerliteApiService;
+        $this->sortFilterService=$subscriberSortFilterService;
         $this->group = Group::first();
     }
 
@@ -45,12 +52,53 @@ class SubscriberController extends Controller
     /**
      * @return JsonResponse
      * returns a list of subscribers belonging to a group
+     * A request may be received to search or order and also paginate results
      */
-    public function getSubscribers(): JsonResponse
+    public function getSubscribers(Request $request): JsonResponse
     {
-        $response = $this->apiService->getSubscribers($this->group);
+        $draw = intval($request->get('draw'));
+        $searchTerm = $request->get('search')['value'];
+        $startIndex = intval($request->get('start'));
+        $length = intval($request->get('length'));
+        $orderColumn = intval($request->get('order')[0]['column']);
+        $direction = $request->get('order')[0]['dir'];
+
+        //get the total number of subscribers
+        $subscribersCountResponse = $this->apiService->getSubscribersCount($this->group);
+        $count = $subscribersCountResponse['data']->count;
+
+        $response=['draw'=>$draw];
+        $response['recordsTotal']=$count;
+        $response['recordsFiltered']=$count;
+        $response['data']=[];
+        //if the count is 0 just return a record showing 0 records total. No need to proceed
+        if($count==0)return response()->json($response);
+
+        if($searchTerm!=null && $searchTerm!=''){
+            //get all records so as to search for that term without missing a record
+            $apiResponse = $this->apiService->getSubscribers($this->group,0,$count);
+            //In case of any failure just return 0 records
+            if(!$apiResponse['status'])return response()->json($response);
+            $filtered = $this->sortFilterService->filterData($searchTerm,$apiResponse['data']);
+            $response['recordsFiltered']=count($filtered);
+            $data=$this->sortFilterService->pageArray($startIndex,$length,$filtered);
+        }else {
+            //if there is nothing to search, let the api do the paging for us
+            $apiResponse = $this->apiService->getSubscribers($this->group,$startIndex,$length);
+            if(!$apiResponse['status'])return response()->json($response);
+            $response['recordsFiltered']=$count;
+            $data=$apiResponse['data'];
+        }
+        //order the data after it has been fetched
+        if($direction!=null && $direction!=""){
+            $this->sortFilterService->orderData($orderColumn,$data,$direction);
+            $response['data']=$data;
+        }
+
         return response()->json($response);
     }
+
+
 
     /**
      * @return View
