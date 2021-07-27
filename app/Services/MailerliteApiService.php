@@ -82,6 +82,17 @@ class MailerliteApiService
     }
 
     /**
+     * @param Group $group
+     * @return array
+     * Queries the API and returns the total number of subscribers in a group
+     */
+    public function getSubscribersCount(Group $group):array
+    {
+        $response = $this->buildHTTPClient()->get(self::GROUP_ENDPOINT_URL.'/'.$group->group_id.'/subscribers/count');
+        return $this->handleResponse($response);
+    }
+
+    /**
      * @param string $email
      * @return array
      * Queries the API for a single subscriber given their email
