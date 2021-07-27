@@ -71,28 +71,27 @@ class SubscriberController extends Controller
         $response['recordsTotal']=$count;
         $response['recordsFiltered']=$count;
         $response['data']=[];
+
         //if the count is 0 just return a record showing 0 records total. No need to proceed
         if($count==0)return response()->json($response);
 
+        //get the subscribers
+        $apiResponse = $this->apiService->getSubscribers($this->group,0,$count);
+        if(!$apiResponse['status'])return response()->json($response);
+        $response['recordsFiltered']=$count;
+        $data=$apiResponse['data'];
+
         if($searchTerm!=null && $searchTerm!=''){
-            //get all records so as to search for that term without missing a record
-            $apiResponse = $this->apiService->getSubscribers($this->group,0,$count);
-            //In case of any failure just return 0 records
-            if(!$apiResponse['status'])return response()->json($response);
-            $filtered = $this->sortFilterService->filterData($searchTerm,$apiResponse['data']);
+            //filter the data if there is something to search
+            $filtered = $this->sortFilterService->filterData($searchTerm,$data);
             $response['recordsFiltered']=count($filtered);
-            $data=$this->sortFilterService->pageArray($startIndex,$length,$filtered);
-        }else {
-            //if there is nothing to search, let the api do the paging for us
-            $apiResponse = $this->apiService->getSubscribers($this->group,$startIndex,$length);
-            if(!$apiResponse['status'])return response()->json($response);
-            $response['recordsFiltered']=$count;
-            $data=$apiResponse['data'];
+            $data=$filtered;
         }
-        //order the data after it has been fetched
+
+        //order the data after it has been fetched and paginate it as required
         if($direction!=null && $direction!=""){
             $this->sortFilterService->orderData($orderColumn,$data,$direction);
-            $response['data']=$data;
+            $response['data']=$this->sortFilterService->pageArray($startIndex,$length,$data);;
         }
 
         return response()->json($response);
