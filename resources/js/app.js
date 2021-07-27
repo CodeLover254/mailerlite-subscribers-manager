@@ -4,6 +4,9 @@ import DataProcessor from "./data-processor";
 $(document).ready(()=>{
    $("#subscribersTable").DataTable({
         processing:true,
+        serverSide: true,
+        ordering:true,
+        searchDelay:500,
         ajax:window.location.origin+'/get-subscribers-list',
         columns:[
             {'data':'email'},

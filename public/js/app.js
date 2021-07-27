@@ -1868,6 +1868,9 @@ __webpack_require__(/*! ./init */ "./resources/js/init.js");
 $(document).ready(function () {
   $("#subscribersTable").DataTable({
     processing: true,
+    serverSide: true,
+    ordering: true,
+    searchDelay: 500,
     ajax: window.location.origin + '/get-subscribers-list',
     columns: [{
       'data': 'email'
