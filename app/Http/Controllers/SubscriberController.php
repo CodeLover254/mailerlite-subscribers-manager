@@ -32,6 +32,7 @@ class SubscriberController extends Controller
     /**
      * SubscriberController constructor.
      * @param MailerliteApiService $mailerliteApiService
+     * @param SubscriberSortFilterService $subscriberSortFilterService
      */
     public function __construct(MailerliteApiService $mailerliteApiService, SubscriberSortFilterService $subscriberSortFilterService)
     {
