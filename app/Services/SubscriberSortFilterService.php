@@ -39,7 +39,7 @@ class SubscriberSortFilterService
      */
     public function pageArray(int $start, int $length, array $data):array
     {
-        return array_slice($data,$start,$length,true);
+        return array_slice($data,$start,$length);
     }
 
     /**
